@@ -1,0 +1,28 @@
+#form_shotrequest_form {
+    width: 520px;
+}
+
+#form_shotrequest_form input[type="text"] {
+    width: 160px;
+}
+
+#form_shotrequest_form input[type="submit"] {
+    margin-left: 200px;
+}
+
+#form_shotrequest_form textarea {
+    width: 393px;
+    height: 100px;
+}
+
+#form_shotrequest_form select {
+    width: 220px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-family: inherit;
+    padding: 6px;
+}
+
+#form_shotrequest_form i {
+    color: red;
+}

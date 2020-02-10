@@ -1,0 +1,20 @@
+#form_contactus_form {
+    width: 520px;
+}
+
+#form_contactus_form input[type="text"] {
+    width: 160px;
+}
+
+#form_contactus_form input[type="submit"] {
+    margin-left: 200px;
+}
+
+#form_contactus_form textarea {
+    width: 350px;
+    height: 100px;
+}
+
+#form_contactus_form i {
+    color: red;
+}

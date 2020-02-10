@@ -1,0 +1,639 @@
+<script type="text/javascript" src="/wp-content/plugins/footagesearch/js/rank_clips.js"></script>
+<!--
+<div class="footagesearch-clips-list-licenses">
+    <img src="<?php echo get_template_directory_uri(); ?>/images/royalty_free_46x38.png" width="23"> <?php _e('Royalty Free', 'footagesearch'); ?>
+    <img src="<?php echo get_template_directory_uri(); ?>/images/rights_managed_46x38.png" width="23"> <?php _e('Rights Managed', 'footagesearch'); ?>
+    <img src="<?php echo get_template_directory_uri(); ?>/images/premium_46x38.png" width="23"> <?php _e('Premium', 'footagesearch'); ?>
+    <img src="<?php echo get_template_directory_uri(); ?>/images/gold_46x38.png" width="23"> <?php _e('Gold', 'footagesearch'); ?>
+</div>
+-->
+<div class="clear"></div>
+<?php
+    $meta=json_decode($clip['metadata']);
+    $stream=$meta->streams[0];
+if (strpos($clip['original_filename'], 'VCW') || strpos($clip['original_filename'], 'VCCW'))
+    $clipRotate=true;
+?>
+
+<hr class="footagesearch-preview-clip-divider"/>
+<div class="footagesearch-preview-prev-next">
+    <div id="footagesearch-clip-<?php echo $clip['id']; ?>" class="footagesearch-preview-clip" style="width: <?php echo $streamW=($stream->width && $stream->height && (($stream->width < $stream->height && empty($clipRotate)) || ($stream->width > $stream->height && !empty($clipRotate))))?'360':'640';?>px;">
+        <div class="footagesearch-preview-clip-top">
+            <h2><?php echo $clip['code']; ?></h2>
+
+            <?php if($clip['license'] == 1){ ?>
+                <div class="footagesearch-preview-clip-license footagesearch-license-<?php echo $clip['license']; ?>">RF</div>
+            <?php } elseif ($clip['license'] == 2) { ?>
+                <?php if($clip['price_level'] == 4) { ?>
+                    <div class="footagesearch-preview-clip-license footagesearch-license-gold">GD</div>
+                <?php } elseif($clip['price_level'] == 3) { ?>
+                    <div class="footagesearch-preview-clip-license footagesearch-license-premium">PR</div>
+                <?php } else { ?>
+                    <div class="footagesearch-preview-clip-license footagesearch-license-<?php echo $clip['license']; ?>">RM</div>
+                <?php } ?>
+            <?php } ?>
+
+            <div class="footagesearch-preview-clip-duration"><?php echo round($clip['duration'])?> sec</div>
+            <div class="clear"></div>
+        </div>
+        <?php
+
+        if(preg_match('/Firefox/i',$_SERVER['HTTP_USER_AGENT'])){
+
+        ?>
+
+            <div style="height:360px; width:100%;">
+                <div id="flashContent">
+                </div>
+            </div>
+            <script type="text/javascript">
+                var video_url = encodeURIComponent("<?php echo $clip['res']; ?>");
+                console.log(video_url);
+                var fn = function() {
+                    var att = { data:"http://dev.naturefootage.com/wp-content/plugins/footagesearch/swf/main_player.swf", width:"640", height:"360", loop:"true", scale:"showall", quality:"high" };
+                    var par = { flashvars:"url="+video_url };
+
+                    var id = "flashContent";
+                    var myObject = swfobject.createSWF(att, par, id);
+                };
+
+                swfobject.addDomLoadEvent(fn);
+            </script>
+
+       <?php
+
+        }elseif(preg_match('/iPad/i',$_SERVER['HTTP_USER_AGENT']) ||
+		preg_match('/iPhone/i',$_SERVER['HTTP_USER_AGENT']) ||
+		preg_match('/Android/i',$_SERVER['HTTP_USER_AGENT'])){
+
+        ?>
+
+        <video id="footagesearch-preview-player<?php echo $clip['id']; ?>"  
+        preload="auto"  
+        width="100%" 
+        height="auto" 
+        poster="http://www.naturefootage.com/wp-content/uploads/2015/03/blackonly.png"
+        style="background:transparent no-repeat url('http://www.naturefootage.com/wp-content/uploads/2015/03/blackonly.png');
+        background-size:100%"
+        controls>
+        <source src="<?php echo $clip['res']; ?>" type="video/mp4" />
+        </video>
+
+        <?php
+        }
+		else {
+        ?>
+
+        <video 
+        id="footagesearch-preview-player<?php echo $clip['id']; ?>"  
+        preload="auto"  
+        width="100%" 
+        height="auto" 
+        autoplay="autoplay"
+        controls>
+        <source src="<?php echo $clip['res']; ?>" type="video/mp4" />
+        </video>
+
+        <?php
+        }
+        ?>
+
+        <div class="footagesearch-preview-clip-action">
+            <!--<div class="footagesearch-clip-preview-play-forward-actions">
+                <img id="play_<?php echo $clip['id']; ?>" src="<?php echo get_template_directory_uri(); ?>/images/play_icon.png" alt="" class="footagesearch-clip-preview-play-btn" style="display:none;"><img id="pause_<?php echo $clip['id']; ?>" src="<?php echo get_template_directory_uri(); ?>/images/pause_icon.png" alt="" class="footagesearch-clip-preview-pause-btn"><img id="forward_<?php echo $clip['id']; ?>" src="<?php echo get_template_directory_uri(); ?>/images/forward_icon.png" alt="" class="footagesearch-clip-preview-forward-btn"><img id="forward3x_<?php echo $clip['id']; ?>" src="<?php echo get_template_directory_uri(); ?>/images/forward3x_icon.png" alt="" class="footagesearch-clip-preview-forward3x-btn">
+            </div>-->
+            <div class="footagesearch-clip-cart-clipbin-actions">
+                <?php if($clip['active'] == 1) { echo ($clip['in_clipbin'] || !empty($_REQUEST['bin'])) ? get_remove_from_clipbin_button($clip['id']) : get_add_to_clipbin_button($clip['id']); echo $clip['in_cart'] ? get_remove_from_cart_button($clip['id']) : get_add_to_cart_button($clip['id']); echo '<a class="preview_download" data-clip-id="' . $clip['id'] . '" target="_blank" href="' . $clip['download'] . $userstring . '"><img src="' . get_template_directory_uri() . '/images/download_icon.png" alt=""></a>'; } ?>
+            </div>
+            <div class="clear"></div>
+
+	        <!--div class="footagesearch-clip-message-button-block">
+		        <div class="footagesearch-clip-message-button" data-clip-id="<?php //echo $clip['id'];?>">
+			        <img src="<?php //echo get_template_directory_uri(); ?>/images/add_comment.png" alt="">
+			        <span><?php //_e( "Send comment", 'footagesearch' ) ?><span>
+		        </div>
+	        </div-->
+
+        </div>
+    </div>
+    <?php if($prev_clip_link) { ?>
+        <a href="<?php echo $prev_clip_link; ?>" class="footagesearch-preview-clip-prev"><img src="<?php echo get_template_directory_uri(); ?>/images/prev_btn.jpg"></a>
+    <?php } ?>
+    <?php if($next_clip_link) { ?>
+        <a href="<?php echo $next_clip_link; ?>" class="footagesearch-preview-clip-next"><img src="<?php echo get_template_directory_uri(); ?>/images/next_btn.jpg"></a>
+    <?php } ?>
+</div>
+
+<!--div class="footagesearch-clip-message-block">
+	<textarea class="footagesearch-clip-message-block-textarea"></textarea>
+	<div class="clear"></div>
+	<button class="footagesearch-clip-message-button-send"><?php //_e( "Send comment", 'footagesearch' ) ?></button>
+</div-->
+
+<hr class="footagesearch-preview-clip-divider"/>
+
+<?php //if($clip['license'] == 1) { ?>
+    <!--div class="footagesearch-cart-item-<?php echo $clip['id'];?> footagesearch-cart-clip-item-<?php echo $clip['id'];?>">
+    <div class="footagesearch-clip-right footagesearch-clip-info footagesearch-preview-clip-info">
+        <table>
+            <tr>
+                <th width="100"><?php _e('Description', 'footagesearch'); ?>:</th>
+                <td><?php echo $clip['description']; ?></td>
+                <td>&nbsp;</td>
+            </tr>
+
+            <tr>
+                <th><?php _e('License Fee', 'footagesearch'); ?>:</th>
+                <td>
+                    <?php
+                    $rf_license_uses = $footagesearch_cart->get_clip_rf_license_uses($clip['id']);
+                    if($rf_license_uses) {?>
+                        <select name="license_term[<?php echo $clip['id']; ?>]" class="footagesearch-license-term" onchange="getRFClipPrice(<?php echo $clip['id']; ?>)">
+                            <?php foreach($rf_license_uses as $use){?>
+                                <option value="<?php echo $use['id']; ?>"<?php if(isset($clip['license_term']) && $clip['license_term'] == $use['id']) echo ' selected="selected"'; ?>><?php if($use['price']) echo '$' . $use['price'] . ' '; echo $use['license']; ?></option>
+                            <?php }?>
+                        </select>
+                    <?php }?>
+                </td>
+                <td>&nbsp;</td>
+            </tr>
+
+            <tr>
+                <th><?php _e('Delivery Options', 'footages'); ?>
+                    <td>
+                        <?php if($clip['delivery_methods']){
+                            if(count($clip['delivery_methods']) > 1){?>
+                                <select name="delivery_method[<?php echo $clip['id']; ?>]" class="footagesearch-delivery-method" onchange="getDeliveryFormats(<?php echo $clip['id']; ?>, <?php echo $clip['license']; ?>, this)">
+                                    <?php
+                                    list($selected_method) = array_keys($clip['delivery_methods']);
+                                    foreach($clip['delivery_methods'] as $key => $method){
+                                        if(isset($method['formats'])){?>
+                                            <option value="<?php echo $method['id']; ?>"<?php if(isset($clip['delivery_method']) && $clip['delivery_method'] == $method['id']){$selected_method = $key; echo ' selected="selected"';}?>><?php echo $method['title']; ?></option>
+                                        <?php
+                                        }
+                                    }?>
+                                </select>
+                                <br>
+                                <select name="delivery_format[<?php echo $clip['id']; ?>]" class="footagesearch-delivery-format" onchange="getRFClipPrice(<?php echo $clip['id']; ?>)">
+                                    <option value="">-- Select Delivery Option --</option>
+                                    <?php
+                                    foreach($clip['delivery_methods'][$selected_method]['formats'] as $format_key => $format){?>
+                                        <option value="<?php echo $format['id']; ?>"<?php if(isset($clip['delivery_format']) && $clip['delivery_format'] == $format['id']){ $selected_format = $format_key; echo ' selected="selected"'; }?>><?php if($clip['license'] != 1) echo '$' . $format['price'] . ' '; echo $format['description']; ?></option>
+                                    <?php
+                                    }?>
+                                </select>
+                            <?php
+                            }
+                            else{
+                                list($selected_method) = array_keys($clip['delivery_methods']);?>
+                                <input type="hidden" name="delivery_method[<?php echo $clip['id']; ?>]" value="<?php echo $clip['delivery_methods'][$selected_method]['id']; ?>">
+                                <select name="delivery_format[<?php echo $clip['id']; ?>]" class="footagesearch-delivery-format" onchange="getRFClipPrice(<?php echo $clip['id']; ?>)">
+                                    <option value="">-- Select Delivery Option --</option>
+                                    <?php
+                                    foreach($clip['delivery_methods'][$selected_method]['formats'] as $format){?>
+                                        <option value="<?php echo $format['id']; ?>"<?php if(isset($clip['delivery_format']) && $clip['delivery_format'] == $format['id']){ $selected_format = $format_key; echo ' selected="selected"'; }?>><?php if($clip['license'] != 1) echo '$' . $format['price'] . ' '; echo $format['description']; ?></option>
+                                    <?php
+                                    }?>
+                                </select>
+                            <?php
+                            }?>
+
+                            <span class="footagesearch-delivery-frame-rate-cont">
+                                <?php if(isset($selected_format) && isset($clip['delivery_methods'][$selected_method]['formats'][$selected_format]['custom_frame_rates'])){?>
+                                    <br>
+                                    <select name="delivery_frame_rate[<?php echo $clip['id']; ?>]" class="footagesearch-delivery-frame-rate">
+                                        <option value="">--Select Frame Rate--</option>
+                                        <?php
+                                        foreach($clip['delivery_methods'][$selected_method]['formats'][$selected_format]['custom_frame_rates'] as $frame_rate){?>
+                                            <option value="<?php echo $frame_rate['id']; ?>"<?php if(isset($clip['delivery_frame_rate']) && $clip['delivery_frame_rate'] == $frame_rate['id']) echo ' selected="selected"';?>><?php echo $frame_rate['format']; ?></option>
+                                        <?php
+                                        }?>
+                                    </select>
+                                <?php }?>
+                                </span>
+
+                        <?php
+                        }?>
+                        <?php if($discounts_link) { ?>
+                            <br><a href="<?php echo $discounts_link; ?>" target="_blank">Discounts</a>
+                        <?php } ?>
+                    </td>
+                    <td>
+                        <div class="footagesearch-license-price-value-cont-wrapper">
+                            <div class="footagesearch-license-price-value-cont-bg"<?php if(!$clip['license_price']) echo ' style="display:none;"';?>>
+                                <div class="footagesearch-license-price-value-cont"><?php if($clip['license_price']) echo '$' . $clip['license_price']; ?></div>
+                            </div>
+                        </div>
+                    </td>
+            </tr>
+        </table>
+    </div>
+    </div-->
+
+<?php //} else { ?>
+    <?php $license_description = ''; ?>
+    <?php if($clip['active'] == 1) { ?>
+    <div class="footagesearch-cart-license-use-cont footagesearch-preview-cart-license-use-cont footagesearch-cart-license-use-select">
+        <table style="width: 100%">
+            <tr><th colspan="2" style="text-align: left;">Pricing Calculator:</th></tr>
+            <tr>
+                <td class="minW135px padding-left-field-popup"><?php _e('License Fee', 'footagesearch'); ?>:</td>
+                <td>
+                    <span class="footagesearch-license-price-cont">
+                        <?php
+                        if($clip['license'] ==1){
+                            $terms = $footagesearch_cart->get_clip_rf_license_uses($clip['id']);
+                            $term = $terms[$clip['license_term']];
+                            $clip['license_price']=($term['price'])?$term['price']:$clip['license_price'];
+                        }
+                        if($clip['license_price'] || $clip['total_price']) {
+                            if($clip['license'] ==1){
+                                echo '$' . $clip['license_price'];
+                            }else{
+                                echo '$' . $clip['total_price'];
+                                if($clip['license_discount'] !== false && $clip['license_old_price'] !== false) echo ' ($' . $clip['license_old_price'] . ' with ' . $clip['license_discount'] . '% discount)';
+                            }
+                        }
+                        else {
+                            if(!empty($clip['display_price'])){
+                                echo '<span><a href="/form-contact-us?modal=1">Contact Us</a> or add clips to Cart to request a Rate Quote</span>';
+                            }else{
+                                echo '<span>Set License Fee by Choosing License Terms Below</span>';
+                            }
+                        } ?>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="minW135px padding-left-field-popup">License Terms:</td>
+                <!--td width="370"><span class="footagesearch-license-description-cont"><?php echo $license_description ?></span></td-->
+                <td>
+                    <?php if($clip['license'] == 1) { ?>
+                        <?php
+                        $rf_license_uses = $footagesearch_cart->get_clip_rf_license_uses($clip['id']);
+                        if($rf_license_uses) {?>
+                            <select name="license_term[<?php echo $clip['id']; ?>]" data-type="rf" class="footagesearch-license-term" onchange="getRFClipPrice(<?php echo $clip['id']; ?>); getLicenseUseSelect(this, <?php echo $clip['id']; ?>, '<?php echo $clip['duration']; ?>')">
+                                <?php foreach($rf_license_uses as $use){?>
+                                    <option value="<?php echo $use['id']; ?>"<?php if(isset($clip['license_term']) && $clip['license_term'] == $use['id']) echo ' selected="selected"'; ?>><?php if($use['price']) echo '$' . $use['price'] . ' '; echo $use['license']; ?></option>
+                                <?php }?>
+                            </select>
+                        <?php }?>
+                    <?php }else{ ?>
+                        <?php if($license_categories){?>
+                            <select name="license_category" class="footagesearch-license-category width-select-popup" onchange="getLicenseUseSelect(this, <?php echo $clip['id']; ?>, '<?php echo $clip['duration']; ?>')">
+                                <option value=""><?php _e('-- Select License Category --', 'footagesearch'); ?></option>
+                                <?php
+                                foreach($license_categories as $category){?>
+                                    <option value="<?php echo $category; ?>" <?php if(isset($cart_license_category) && $cart_license_category == $category){?>selected="selected"<?php }?>><?php echo $category; ?></option>
+                                <?php }?>
+                            </select>
+                        <?php }?>
+                        <span class="footagesearch-license-use-cont">
+                                <?php if(!empty($cart_license_category)){
+                                    $uses = $footagesearch_cart->get_license_uses($cart_license_category);
+                                    if($uses){?>
+                                        <br>
+                                        <select name="license_use" class="footagesearch-license-use width-select-popup" onchange="getLicenseTermSelect(this, <?php echo $clip['id']; ?>, '<?php echo $clip['duration']; ?>', 1)">
+                                            <option value="">-- Select Use --</option>
+                                            <?php
+                                            foreach($uses as $use){?>
+                                                <option value="<?php echo $use['id']; ?>" data='<?php echo json_encode($use); ?>' <?php if(isset($cart_license_use) && $cart_license_use == $use['id']){ $license_description .= $use['description']; ?>selected="selected"<?php }?>><?php echo $use['use']; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    <?php }}?>
+                            </span>
+                            <span class="footagesearch-license-term-cont">
+                                <?php
+                                if(isset($cart_license_use)){
+                                    $terms = $footagesearch_cart->get_license_terms($cart_license_use);
+                                    if($terms){?>
+                                        <br>
+                                        <select name="license_term" data-type="rm" class="footagesearch-license-term width-select-popup" onchange="getClipPrice(<?php echo $clip['id']; ?>);">
+                                            <option value="">-- Select Terms --</option>
+                                            <?php
+                                            foreach($terms as $term){?>
+                                                <option value="<?php echo $term['id']; ?>" data='<?php echo json_encode($term); ?>' <?php if(isset($cart_license_term) && $cart_license_term == $term['id']){ $license_description .= ';<br>' . $term['territory'] . ' ' . $term['term'] . '.'; ?>selected="selected"<?php }?>><?php echo $term['territory'] . ' ' . $term['term'];?></option>
+                                            <?php } ?>
+                                        </select>
+                                    <?php }}?>
+                            </span>
+                        <input type="hidden" class="footagesearch-license-description-input" value="<?php echo $license_description ?>">
+                    <?php } ?>
+                </td>
+                <!--td class="last">
+                    <?php if($clip['license_category'] || $clip['license_use'] || $clip['license_term']) { ?>
+                    <!--button class="footagesearch-cart-change-license-use">Change License Use</button-->
+                    <?php } ?>
+                <!--/td-->
+            </tr>
+            <?php if($clip['license']!=1){?>
+                <tr>
+                    <td class="minW135px ">License Use:</td>
+                    <td width="700"><span class="footagesearch-license-description-cont"><?php echo $license_description ?></span></td>
+                </tr>
+                <!--tr class="footagesearch-cart-license-use-select"<?php if($clip['license_category'] || $clip['license_use'] || $clip['license_term']) { echo 'style="display:none;"'; } ?>>
+                    <td colspan="3">
+                        <?php if($license_categories){?>
+                            <select name="license_category" class="footagesearch-license-category" onchange="getLicenseUseSelect(this, <?php echo $clip['id']; ?>, '<?php echo $clip['duration']; ?>')">
+                                <option value=""><?php _e('-- Select License Category --', 'footagesearch'); ?></option>
+                                <?php
+                                foreach($license_categories as $category){?>
+                                    <option value="<?php echo $category; ?>" <?php if(isset($cart_license_category) && $cart_license_category == $category){?>selected="selected"<?php }?>><?php echo $category; ?></option>
+                                <?php }?>
+                            </select>
+                        <?php }?>
+                        <span class="footagesearch-license-use-cont">
+                                <?php if(isset($cart_license_category)){
+                                    $uses = $footagesearch_cart->get_license_uses($cart_license_category);
+                                    if($uses){?>
+                                        <br>
+                                        <select name="license_use" class="footagesearch-license-use" onchange="getLicenseTermSelect(this, <?php echo $clip['id']; ?>, '<?php echo $clip['duration']; ?>', 1)">
+                                            <option value="">-- Select Use --</option>
+                                            <?php
+                                            foreach($uses as $use){?>
+                                                <option value="<?php echo $use['id']; ?>" data='<?php echo json_encode($use); ?>' <?php if(isset($cart_license_use) && $cart_license_use == $use['id']){ $license_description .= $use['description']; ?>selected="selected"<?php }?>><?php echo $use['use']; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    <?php }}?>
+                            </span>
+                            <span class="footagesearch-license-term-cont">
+                                <?php
+                                if(isset($cart_license_use)){
+                                    $terms = $footagesearch_cart->get_license_terms($cart_license_use);
+                                    if($terms){?>
+                                        <br>
+                                        <select name="license_term" class="footagesearch-license-term" onchange="getClipPrice(<?php echo $clip['id']; ?>);">
+                                            <option value="">-- Select Terms --</option>
+                                            <?php
+                                            foreach($terms as $term){?>
+                                                <option value="<?php echo $term['id']; ?>" data='<?php echo json_encode($term); ?>' <?php if(isset($cart_license_term) && $cart_license_term == $term['id']){ $license_description .= ';<br>' . $term['territory'] . ' ' . $term['term'] . '.'; ?>selected="selected"<?php }?>><?php echo $term['territory'] . ' ' . $term['term'];?></option>
+                                            <?php } ?>
+                                        </select>
+                                    <?php }}?>
+                            </span>
+                        <input type="hidden" class="footagesearch-license-description-input" value="<?php echo $license_description ?>">
+                    </td>
+                </tr-->
+            <?php } ?>
+            <tr>
+                <td class="minW135px ">Restrictions:</td>
+                <td width="700"><span class="footagesearch-license-restrictions"><?php echo $license_restrictions ?></span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footagesearch-cart-item-<?php echo $clip['id']; ?> footagesearch-cart-clip-item-<?php echo $clip['id']; ?>">
+        <div class="footagesearch-clip-right footagesearch-clip-info footagesearch-preview-clip-info">
+            <table style="width: 100%">
+                <!--<tr>
+                    <th width="100"><?php _e('Description', 'footagesearch'); ?>:</th>
+                    <td><?php echo $clip['description']; ?></td>
+                    <td>&nbsp;</td>
+                </tr>-->
+                <?php if ($clip['license']!=1){?>
+                    <tr>
+                        <td class="minW135px"><?php _e('Duration Used', 'footagesearch'); ?>:</td>
+                        <td width="700" class="footagesearch-license-duration-cont">
+                            <?php
+                            if(isset($clip['license_use']) && $clip['duration']){
+                                $min_duration = $footagesearch_cart->get_license_use_min_duration($clip['license_use']);
+                                $max_duration = $min_duration;
+                                if($max_duration < $clip['duration'])
+                                    $max_duration = (int)$clip['duration'];
+                                if($min_duration){?>
+                                    <select name="license_duration[<?php echo $clip['id']; ?>]" class="footagesearch-license-duration width-select-popup " onchange="getClipPrice(<?php echo $clip['id']; ?>)">
+                                        <?php
+                                        for($duration = $min_duration; $duration <= $max_duration; $duration++){?>
+                                            <option value="<?php echo $duration; ?>" <?php if(isset($clip['license_duration']) && $clip['license_duration'] == $duration){?>selected="selected"<?php }?>><?php echo $duration;?> seconds</option>
+                                        <?php } ?>
+                                    </select>
+                                <?php }}?>
+                        </td>
+                    </tr>
+                <?php } ?>
+                <!--Licensed Fee old-->
+                <tr>
+                    <td class="minW135px"><?php _e('Delivery Options', 'footages'); ?></td>
+                    <td><?php //var_dump([$format,$method,$clip]);?>
+                        <?php $getPrice=($clip['license']==1)? 'getRFClipPrice' : 'getClipPrice'; ?>
+                        <?php if($clip['delivery_methods']){
+                            if(count($clip['delivery_methods']) > 1){?>
+                                <select name="delivery_method[<?php echo $clip['id']; ?>]" class="footagesearch-delivery-method width-select-popup" onchange="getDeliveryFormats(<?php echo $clip['id']; ?>, <?php echo $clip['license']; ?>, this, 1)">
+                                    <?php
+                                    list($selected_method) = array_keys($clip['delivery_methods']);
+                                    foreach($clip['delivery_methods'] as $key => $method){
+                                        if(isset($method['formats'])){?>
+                                            <option value="<?php echo $method['id']; ?>"<?php if(isset($clip['delivery_method']) && $clip['delivery_method'] == $method['id']){$selected_method = $key; echo ' selected="selected"';}?>><?php echo $method['title']; ?></option>
+                                        <?php
+                                        }
+                                    }?>
+                                </select>
+                                <br>
+                                <select name="delivery_format[<?php echo $clip['id']; ?>]" class="footagesearch-delivery-format width-select-popup" onchange="<?php echo $getPrice;?>(<?php echo $clip['id']; ?>, this)">
+                                    <option value="">-- Select Delivery Option --</option>
+                                    <?php
+                                    foreach($clip['delivery_methods'][$selected_method]['formats'] as $format_key => $format){?>
+                                        <option value="<?php echo $format['id']; ?>"<?php if(isset($clip['delivery_format']) && $clip['delivery_format'] == $format['id']){ $selected_format = $format_key; echo ' selected="selected"'; }?> data-price="<?php echo $format['price']; ?>" data-description="<?php echo $format['description']; ?>">
+                                            <?php echo $format['description']; if($clip['license'] != 1 && $clip['license_price'] && $format['price']) echo ' ($' . $format['price'] . ')'; ?>
+                                        </option>
+                                    <?php
+                                    }?>
+                                </select>
+                            <?php
+                            }
+                            else{
+                                list($selected_method) = array_keys($clip['delivery_methods']);?>
+                                <input type="hidden" name="delivery_method[<?php echo $clip['id']; ?>]" value="<?php echo $clip['delivery_methods'][$selected_method]['id']; ?>">
+                                <select name="delivery_format[<?php echo $clip['id']; ?>]" class="footagesearch-delivery-format width-select-popup" onchange="<?php echo $getPrice; ?>(<?php echo $clip['id']; ?>, this)">
+                                    <option value="">-- Select Delivery Option --</option>
+                                    <?php
+                                    foreach($clip['delivery_methods'][$selected_method]['formats'] as $format){?>
+                                        <option value="<?php echo $format['id']; ?>"<?php if(isset($clip['delivery_format']) && $clip['delivery_format'] == $format['id']){ $selected_format = $format_key; echo ' selected="selected"'; }?> data-price="<?php echo $format['price']; ?>" data-description="<?php echo $format['description']; ?>">
+                                            <?php echo $format['description']; if($clip['license'] != 1 && $clip['license_price'] && $format['price']) echo ' ($' . $format['price'] . ')'; ?>
+                                        </option>
+                                    <?php
+                                    }?>
+                                </select>
+                            <?php
+                            }?>
+
+                            <span class="footagesearch-delivery-frame-rate-cont">
+                            <?php if(isset($selected_format) && isset($clip['delivery_methods'][$selected_method]['formats'][$selected_format]['custom_frame_rates'])){?>
+                                <br>
+                                <select name="delivery_frame_rate[<?php echo $clip['id']; ?>]" class="footagesearch-delivery-frame-rate width-select-popup">
+                                    <option value="">--Select Frame Rate--</option>
+                                    <?php
+                                    foreach($clip['delivery_methods'][$selected_method]['formats'][$selected_format]['custom_frame_rates'] as $frame_rate){?>
+                                        <option value="<?php echo $frame_rate['id']; ?>"<?php if(isset($clip['delivery_frame_rate']) && $clip['delivery_frame_rate'] == $frame_rate['id']) echo ' selected="selected"';?>><?php echo $frame_rate['format']; ?></option>
+                                    <?php
+                                    }?>
+                                </select>
+                            <?php }?>
+                            </span>
+
+                        <?php
+                        }?>
+                        <div><a href="#" class="<?php echo $clip['license'] ==1 ? 'footagesearch-rf-discounts-link' : 'footagesearch-discounts-link'; ?>">Discounts</a></div>
+                        <div style="display: none;" class="footagesearch-discounts-cont"></div>
+                    </td>
+                    <!--td style="text-align: right;">
+                        <!--div class="footagesearch-license-price-value-cont-wrapper">
+                            <div class="footagesearch-license-price-value-cont-bg"<?php if(!$clip['total_price']) echo ' style="display:none;"';?>>
+                                <div class="footagesearch-license-price-value-cont"><?php if($clip['total_price']) echo '$' . $clip['total_price']; ?></div>
+                            </div>
+                        </div-->
+                    <!--/td-->
+                </tr>
+                </tr>
+            </table>
+        </div>
+
+        <div class="clearboth"></div>
+
+    </div>
+    <?php } ?>
+
+<?php //} ?>
+
+<?php
+
+//echo '<pre>';
+//print_r($clip);
+//exit();
+
+?>
+
+<div class="footagesearch-preview-clip-details">
+    <h2><?php _e('Clip Details' , 'footagesearch'); ?></h2>
+    <table>
+        <?php
+            $clip['source_format_display'] = array();
+            if($clip['source_format']){
+                $clip['source_format_display'][] = $clip['source_format'] . ($clip['camera_chip_size'] ? ' (' . $clip['camera_chip_size'] . ')' : '');
+            }
+            if($clip['source_frame_size']){
+                $clip['source_format_display'][] = $clip['source_frame_size'];
+            }
+            if($clip['source_frame_rate']){
+                $clip['source_format_display'][] = $clip['source_frame_rate'];
+            }
+            if($clip['source_codec']){
+                $clip['source_format_display'][] = $clip['source_codec'];
+            }
+            if($clip['bit_depth']){
+                $clip['source_format_display'][] = $clip['bit_depth'];
+            }
+            if($clip['color_space']){
+                $clip['source_format_display'][] = $clip['color_space'];
+            }
+        ?>
+        <?php if($clip['description']) { ?>
+            <tr>
+                <td class="minW135px"><?php _e('Description' , 'footagesearch'); ?></td>
+                <td><?php echo $clip['description']; ?></td>
+            </tr>
+        <?php } ?>
+        <?php if($clip['source_format_display']) { ?>
+        <tr>
+            <td class="minW135px"><?php _e('Source Format' , 'footagesearch'); ?></td>
+            <td><?php echo implode(', ', $clip['source_format_display']); ?></td>
+        </tr>
+        <?php } var_dump($clip['film_date']); ?>
+        <?php if($clip['shot_type'] || (!empty($clip['film_date']) && $clip['film_date']!='0000-00-00')) { ?>
+            <tr>
+                <td class="minW135px"><?php _e('The Shot' , 'footagesearch'); ?></td>
+                <td>
+                    <?php if($clip['shot_type']) {
+                    foreach ($clip['shot_type'] as $keyword) {
+                        if($keyword) { ?>
+                            <a href="<?php echo (add_query_arg('fs', urlencode($keyword), $clips_holder_permalink)); ?>" onclick="window.opener.location.href = this.href; return false;" class="footagesearch-preview-clip-keyword"><?php echo $keyword; ?></a>
+                    <?php }}} ?>
+                    <?php if(!empty($clip['film_date']) && $clip['film_date']!='0000-00-00') { ?>
+                        <div class="footagesearch-preview-clip-keyword"><?php echo date('d.m.Y', strtotime($clip['film_date'])); ?></div>
+                    <?php } ?>
+                    <div class="clearfix"></div>
+                </td>
+            </tr>
+        <?php } ?>
+        <?php if($clip['subject_category'] || $clip['primary_subject'] || $clip['The Shot_subject'] || $clip['appearance'] || $clip['concept']) { ?>
+        <tr>
+            <td class="minW135px"><?php _e('Subject' , 'footagesearch'); ?></td>
+            <td>
+                <?php
+                if($clip['subject_category']) {
+                foreach ($clip['subject_category'] as $keyword) {
+                    if($keyword) { ?>
+                        <a href="<?php echo (add_query_arg('fs', urlencode($keyword), $clips_holder_permalink)); ?>" onclick="window.opener.location.href = this.href; return false;" class="footagesearch-preview-clip-keyword"><?php echo $keyword; ?></a>
+                <?php }}} ?>
+                <?php
+                if($clip['primary_subject']) {
+                foreach ($clip['primary_subject'] as $keyword) {
+                    if($keyword) { ?>
+                        <a href="<?php echo (add_query_arg('fs', urlencode($keyword), $clips_holder_permalink)); ?>" onclick="window.opener.location.href = this.href; return false;" class="footagesearch-preview-clip-keyword"><?php echo $keyword; ?></a>
+                <?php }}} ?>
+                <?php
+                if($clip['other_subject']) {
+                foreach ($clip['other_subject'] as $keyword) {
+                    if($keyword) { ?>
+                        <a href="<?php echo (add_query_arg('fs', urlencode($keyword), $clips_holder_permalink)); ?>" onclick="window.opener.location.href = this.href; return false;" class="footagesearch-preview-clip-keyword"><?php echo $keyword; ?></a>
+                <?php }}} ?>
+                <?php
+                if($clip['appearance']) {
+                foreach ($clip['appearance'] as $keyword) {
+                    if($keyword) { ?>
+                        <a href="<?php echo (add_query_arg('fs', urlencode($keyword), $clips_holder_permalink)); ?>" onclick="window.opener.location.href = this.href; return false;" class="footagesearch-preview-clip-keyword"><?php echo $keyword; ?></a>
+                <?php }}} ?>
+                <?php
+                if($clip['concept']) {
+                foreach ($clip['concept'] as $keyword) {
+                    if($keyword) { ?>
+                        <a href="<?php echo (add_query_arg('fs', urlencode($keyword), $clips_holder_permalink)); ?>" onclick="window.opener.location.href = this.href; return false;" class="footagesearch-preview-clip-keyword"><?php echo $keyword; ?></a>
+                <?php }}} ?>
+                <div class="clearfix"></div>
+            </td>
+        </tr>
+        <?php } ?>
+
+        <?php if($clip['actions']) { ?>
+        <tr>
+            <td class="minW135px"><?php _e('Action' , 'footagesearch'); ?></td>
+            <td>
+                <?php foreach ($clip['actions'] as $keyword) {
+                    if($keyword) { ?>
+                        <a href="<?php echo (add_query_arg('fs', urlencode($keyword), $clips_holder_permalink)); ?>" onclick="window.opener.location.href = this.href; return false;" class="footagesearch-preview-clip-keyword"><?php echo $keyword; ?></a>
+                <?php }} ?>
+                <div class="clearfix"></div>
+            </td>
+        </tr>
+        <?php } ?>
+        <?php if($clip['time'] || $clip['habitat'] || $clip['location'] || $clip['country']) { ?>
+        <tr>
+            <td class="minW135px"><?php _e('Environment' , 'footagesearch'); ?></td>
+            <td>
+                <?php
+                if($clip['time']){
+                foreach ($clip['time'] as $keyword) {
+                    if($keyword) { ?>
+                        <a href="<?php echo (add_query_arg('fs', urlencode($keyword), $clips_holder_permalink)); ?>" onclick="window.opener.location.href = this.href; return false;" onclick="window.opener.location.href = this.href; return false;" class="footagesearch-preview-clip-keyword"><?php echo $keyword; ?></a>
+                <?php }}} ?>
+                <?php
+                if($clip['habitat']){
+                    foreach ($clip['habitat'] as $keyword) {
+                        if($keyword) { ?>
+                            <a href="<?php echo (add_query_arg('fs', urlencode($keyword), $clips_holder_permalink)); ?>" onclick="window.opener.location.href = this.href; return false;" class="footagesearch-preview-clip-keyword"><?php echo $keyword; ?></a>
+                <?php }}} ?>
+                <?php
+                if($clip['location']){
+                    foreach ($clip['location'] as $keyword) {
+                        if($keyword) { ?>
+                            <a href="<?php echo (add_query_arg('fs', urlencode($keyword), $clips_holder_permalink)); ?>" onclick="window.opener.location.href = this.href; return false;" class="footagesearch-preview-clip-keyword"><?php echo $keyword; ?></a>
+                <?php }}} ?>
+                <?php if($clip['country']){ ?>
+                    <a href="<?php echo (add_query_arg('fs', urlencode($clip['country']), $clips_holder_permalink)); ?>" onclick="window.opener.location.href = this.href; return false;" class="footagesearch-preview-clip-keyword"><?php echo $clip['country']; ?></a>
+                <?php } ?>
+                <div class="clearfix"></div>
+            </td>
+        </tr>
+        <?php } ?>
+    </table>
+</div>
